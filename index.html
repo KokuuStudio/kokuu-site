@@ -98,7 +98,16 @@
     /* 两行都不带末尾标点：全角「，/。」的墨迹偏左 0.33em，
        带了会让整块视觉左移；不加标点则任何字体下都真正居中 */
   }
-  .hero h1 .stroke { color: transparent; -webkit-text-stroke: 1.4px var(--ink); }
+  /* 第二行：实心填充 + 细描边，不用 color:transparent。
+     原因：部分安卓自带浏览器(如 OPPO/ColorOS)对
+     -webkit-text-stroke + transparent 组合渲染异常，会让整块文字消失或糊掉。
+     保留实心 fill 作兜底 → 描边不渲染时退化为实心文字，任何内核都清晰可读；
+     支持描边的浏览器上呈「实心+细描边」。两行用色差(墨/雨青)保留视觉层次。 */
+  .hero h1 .stroke {
+    color: var(--rain);
+    -webkit-text-stroke: 1.2px var(--ink);
+    paint-order: stroke fill;
+  }
   .hero-en {
     margin-top: 16px;
     font-family: var(--mono); font-size: clamp(10px, 1.5vw, 13px);
@@ -138,7 +147,11 @@
   .sec-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 52px; flex-wrap: wrap; }
   .sec-num { font-family: var(--mono); font-size: 13px; color: var(--rain); letter-spacing: .15em; }
   .sec-title { font-size: clamp(28px, 5vw, 48px); font-weight: 900; letter-spacing: .04em; }
-  .sec-title .stroke { color: transparent; -webkit-text-stroke: 1.2px var(--ink); }
+  .sec-title .stroke {
+    color: var(--rain);
+    -webkit-text-stroke: 1px var(--ink);
+    paint-order: stroke fill;
+  }
   .sec-note { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-50); letter-spacing: .1em; }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
