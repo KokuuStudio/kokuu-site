@@ -32,8 +32,8 @@
   }
   /* 自定义光标只在有精确指针的设备上启用（触摸设备不加载，省性能） */
   @media (hover: hover) and (pointer: fine) {
-    body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 21 V13' stroke='%230FA3A3' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M12 15 C9 15 6 13 5 9 C9 10 12 12 12 15 Z' fill='%230FA3A3'/%3E%3Cpath d='M12 15 C15 15 18 13 19 9 C15 10 12 12 12 15 Z' fill='%230FA3A3'/%3E%3Ccircle cx='12' cy='11' r='1.6' fill='%230FA3A3'/%3E%3C/svg%3E") 12 12, auto; }
-    a, button { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M14 25 V15' stroke='%232B1F52' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M14 18 C10 18 6 15 5 10 C11 11 14 13 14 18 Z' fill='%232B1F52'/%3E%3Cpath d='M14 18 C18 18 22 15 23 10 C17 11 14 13 14 18 Z' fill='%232B1F52'/%3E%3Ccircle cx='14' cy='13' r='1.9' fill='%232B1F52'/%3E%3C/svg%3E") 14 14, pointer; }
+    body { cursor: default; }
+    a, button { cursor: pointer; }
   }
   ::selection { background: var(--rain); color: #fff; }
 
