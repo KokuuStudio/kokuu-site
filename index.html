@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>KOKUU 谷雨工作室 — 雨落下之后，就交给时间</title>
+<meta name="description" content="KOKUU 谷雨工作室（kokuu.org）：Minecraft 服务器运营、皮肤站与登录验证、AI 变声器成品模型交付。雨落下之后，就交给时间。">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<style>
+  :root {
+    --paper:  #F5F3EE;   /* 暖白纸底 */
+    --card:   #FFFFFF;
+    --ink:    #2B1F52;   /* 品牌墨色 */
+    --ink-50: #6b5fa8;
+    --rain:   #0FA3A3;   /* 雨青 — 清新主点缀 */
+    --haze:   #8B7FD4;   /* 亮紫 — 次点缀 */
+    --line:   rgba(43,31,82,.16);
+    --mono: "Cascadia Code", "JetBrains Mono", "Sarasa Mono SC", "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+    --sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", "Heiti SC", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* <picture> 只做 WebP/PNG 格式协商，不参与布局（老浏览器忽略此行，退化为 inline，与原来一致） */
+  picture { display: contents; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow-x: hidden;
+  }
+  /* 自定义光标只在有精确指针的设备上启用（触摸设备不加载，省性能） */
+  @media (hover: hover) and (pointer: fine) {
+    body { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C12 2 6 10 6 15a6 6 0 0 0 12 0C18 10 12 2 12 2Z' fill='%230FA3A3'/%3E%3C/svg%3E") 12 12, auto; }
+    a, button { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M14 2C14 2 7 11 7 16.5a7 7 0 0 0 14 0C21 11 14 2 14 2Z' fill='%232B1F52'/%3E%3C/svg%3E") 14 14, pointer; }
+  }
+  ::selection { background: var(--rain); color: #fff; }
+
+  /* ---------- 雨 ---------- */
+  #rain { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+  /* ---------- 纸纹噪点 ---------- */
+  body::after {
+    content: ""; position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; z-index: 60; opacity: .035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap { position: relative; z-index: 5; }
+
+  /* ---------- 状态栏 ---------- */
+  .statusbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    /* iOS 刘海屏安全区 */
+    padding: calc(10px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 10px calc(20px + env(safe-area-inset-left));
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    color: var(--ink-50);
+    background: rgba(245,243,238,.94);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px dashed var(--line);
+  }
+  .statusbar .dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--rain); margin-right: 6px; animation: blink 2.4s infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: .25 } }
+  .statusbar b { color: var(--ink); font-weight: 400; }
+  @media (max-width: 700px) { .statusbar .hide-s { display: none } }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    min-height: 100vh;          /* 老浏览器回退 */
+    min-height: 100svh;         /* 移动端地址栏不跳动 */
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: calc(84px + env(safe-area-inset-top)) 24px 72px;
+    position: relative;
+  }
+  .hero::before {
+    content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120vw; height: 90vh; z-index: -1;
+    background: radial-gradient(ellipse at 50% 32%, rgba(15,163,163,.14), transparent 62%);
+  }
+  .bar-logo { height: 17px; margin-right: 8px; vertical-align: -4px; }
+  .hero-logo {
+    width: min(44vw, 300px); user-select: none; -webkit-user-drag: none;
+    animation: floaty 6s ease-in-out infinite;
+  }
+  @keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-11px) } }
+  .hero-id {
+    font-family: var(--mono); font-size: clamp(11px, 1.5vw, 13px);
+    color: var(--ink-50); letter-spacing: .12em; margin: 26px 0 16px;
+  }
+  .hero h1 {
+    font-size: clamp(26px, 5.6vw, 64px);
+    line-height: 1.2; font-weight: 900; letter-spacing: .02em;
+    /* 两行都不带末尾标点：全角「，/。」的墨迹偏左 0.33em，
+       带了会让整块视觉左移；不加标点则任何字体下都真正居中 */
+  }
+  .hero h1 .stroke { color: transparent; -webkit-text-stroke: 1.4px var(--ink); }
+  .hero-en {
+    margin-top: 16px;
+    font-family: var(--mono); font-size: clamp(10px, 1.5vw, 13px);
+    letter-spacing: .3em; color: var(--ink-50);
+    padding-left: .3em;              /* 同上：补偿末字右侧多出的字距 */
+  }
+  .hero-sub {
+    margin-top: 30px; font-family: var(--mono);
+    font-size: clamp(13px, 1.8vw, 16px); line-height: 2;
+    color: var(--ink-50); max-width: 660px;
+  }
+  .hero-sub b { color: var(--ink); font-weight: 400; }
+
+  .scroll-hint {
+    position: absolute; bottom: 26px;
+    font-family: var(--mono); font-size: 11px; color: var(--ink-50);
+    letter-spacing: .2em; animation: hint 2s infinite;
+  }
+  @keyframes hint { 0%,100% { transform: translateY(0); opacity: .9 } 50% { transform: translateY(8px); opacity: .4 } }
+
+  /* ---------- 像素闯关横幅（全宽） ---------- */
+  .stage-band {
+    width: 100%; display: block;
+    height: 229px;
+    -moz-image-rendering: crisp-edges;
+    -webkit-image-rendering: -webkit-optimize-contrast;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+    border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line);
+    background: rgba(255,255,255,.45);
+  }
+  @media (max-width: 700px) { .stage-band { height: 176px; } }
+
+  /* ---------- 章节通用 ---------- */
+  section { padding: 108px 24px; max-width: 1060px; margin: 0 auto; }
+  .sec-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 52px; flex-wrap: wrap; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--rain); letter-spacing: .15em; }
+  .sec-title { font-size: clamp(28px, 5vw, 48px); font-weight: 900; letter-spacing: .04em; }
+  .sec-title .stroke { color: transparent; -webkit-text-stroke: 1.2px var(--ink); }
+  .sec-note { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-50); letter-spacing: .1em; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.on { opacity: 1; transform: none; }
+
+  /* ---------- 宣言 ---------- */
+  .manifesto { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 720px) { .manifesto { grid-template-columns: 1fr } }
+  .m-col { border: 1px dashed var(--line); padding: 34px 30px; position: relative; background: rgba(255,255,255,.55); }
+  .m-col .m-tag {
+    position: absolute; top: -13px; left: 22px; background: var(--paper);
+    padding: 2px 12px; font-family: var(--mono); font-size: 12px; letter-spacing: .18em;
+  }
+  .m-col.no .m-tag { color: #c96a6a; }
+  .m-col.yes .m-tag { color: var(--rain); }
+  .m-col ul { list-style: none; }
+  .m-col li { font-size: clamp(15px, 2.2vw, 19px); line-height: 2.15; }
+  .m-col li .mark { font-family: var(--mono); margin-right: 12px; opacity: .8; }
+  .m-col.no li { color: var(--ink-50); text-decoration: line-through; text-decoration-color: rgba(201,106,106,.5); text-decoration-thickness: 1.5px; }
+  .m-col.no li:last-child { text-decoration: none; }
+  .m-foot {
+    margin-top: 38px; font-family: var(--mono); font-size: 13px;
+    color: var(--ink-50); text-align: center; letter-spacing: .08em;
+  }
+
+  /* ---------- 业务贴纸 ---------- */
+  .stickers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; padding-top: 10px; }
+  .sticker {
+    --rot: 0deg; --c: var(--rain);
+    background: var(--card); color: var(--ink);
+    padding: 30px 24px 26px;
+    transform: rotate(var(--rot));
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+    box-shadow: 6px 6px 0 var(--c);
+    border: 1px solid rgba(43,31,82,.08);
+    position: relative;
+  }
+  .sticker:hover { transform: rotate(0deg) translateY(-7px) scale(1.02); box-shadow: 10px 13px 0 var(--c); }
+  .sticker::before {
+    content: ""; position: absolute; top: -10px; left: 50%;
+    width: 76px; height: 20px; transform: translateX(-50%) rotate(-2deg);
+    background: rgba(43,31,82,.10);                       /* 老浏览器回退 */
+    background: linear-gradient(rgba(255,255,255,.78), rgba(255,255,255,.78)), var(--c);  /* 半透明胶带（不用 color-mix，兼容老 WebView） */
+    border-left: 1px dashed rgba(255,255,255,.7); border-right: 1px dashed rgba(255,255,255,.7);
+  }
+  .sticker .s-num { font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: var(--c); }
+  .sticker h3 { font-size: clamp(20px, 3vw, 26px); font-weight: 900; margin: 8px 0 2px; }
+  .sticker .s-en { font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--ink-50); margin-bottom: 14px; }
+  .sticker p { font-size: 14.5px; line-height: 1.9; color: #463c6b; }
+  .sticker p b { color: var(--ink); font-weight: 700; }
+  .sticker.main { box-shadow: 8px 8px 0 var(--rain); }
+
+  /* ---------- 成员 ---------- */
+  .crew-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+  .crew {
+    background: var(--card); border: 1px solid rgba(43,31,82,.1);
+    padding: 26px 18px 22px; text-align: center;
+    transition: background .25s, transform .25s, box-shadow .25s;
+  }
+  .crew:hover { transform: translateY(-6px); box-shadow: 5px 7px 0 var(--rain); }
+  .crew .glyph { font-size: 52px; font-weight: 900; font-family: var(--mono); color: var(--rain); line-height: 1; display: block; margin-bottom: 14px; }
+  .crew .role { font-size: 15px; font-weight: 700; }
+  .crew .loc { font-family: var(--mono); font-size: 11px; color: var(--ink-50); margin-top: 6px; letter-spacing: .1em; }
+  .crew.locked { background: transparent; border-style: dashed; }
+  .crew.locked .glyph { color: rgba(43,31,82,.28); }
+  .crew.locked .role { color: var(--ink-50); font-weight: 400; }
+  .crew-note { margin-top: 34px; font-family: var(--mono); font-size: 13px; line-height: 2; color: var(--ink-50); text-align: center; }
+  .crew-note b { color: var(--ink); font-weight: 400; }
+  .crew-mail {
+    margin-top: 12px; text-align: center;
+    font-family: var(--mono); font-size: 13px; color: var(--ink-50);
+  }
+  .mailto {
+    color: var(--ink); text-decoration: none;
+    border-bottom: 1px dotted var(--rain); padding-bottom: 1px;
+  }
+  .mailto:hover { color: var(--rain); border-bottom-style: solid; }
+
+  /* ---------- 页脚 ---------- */
+  footer {
+    border-top: 1px dashed var(--line);
+    padding: 60px 24px 44px; position: relative; z-index: 5;
+    background: rgba(255,255,255,.5);
+  }
+  .foot-inner {
+    max-width: 1060px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 40px; flex-wrap: wrap;
+  }
+  .f-logo { width: 96px; opacity: .92; display: block; }
+  .foot-right {
+    text-align: right; font-family: var(--mono); font-size: 12px;
+    line-height: 2.3; color: var(--ink-50);
+  }
+  .foot-right .secret { opacity: .55; transition: opacity .2s; }
+  .foot-right .secret:hover { opacity: 1; color: var(--rain); }
+  @media (max-width: 640px) { .foot-right { text-align: left; } }
+
+  body.storm .hero-logo { animation: shake .35s infinite; }
+  @keyframes shake {
+    0%,100% { transform: translate(0,0) rotate(0) }
+    25% { transform: translate(1px,-1px) rotate(.6deg) }
+    75% { transform: translate(-1px,1px) rotate(-.6deg) }
+  }
+
+  /* ---------- 移动端 / 小屏 ---------- */
+  @media (max-width: 700px) {
+    section { padding: 70px 20px; }
+    .sec-head { margin-bottom: 34px; gap: 12px; }
+    .sec-note { margin-left: 0; width: 100%; }
+    .hero { padding-top: 76px; padding-bottom: 56px; }
+    .hero-logo { width: 56vw; }
+    .hero-sub { font-size: 13.5px; line-height: 1.95; }
+    .m-col { padding: 28px 20px; }
+    .m-col li { font-size: 15px; line-height: 2; }
+    .stickers { gap: 22px; }
+    .crew-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 14px; }
+    .crew .glyph { font-size: 40px; margin-bottom: 10px; }
+    .crew .role { font-size: 14px; }
+    .foot-inner { gap: 24px; }
+    footer { padding: 52px 20px 40px; }
+    .foot-right { line-height: 2.1; }
+    .scroll-hint { display: none; }
+  }
+
+  /* 矮窗口 / 手机横屏 */
+  @media (max-height: 540px) {
+    .hero { min-height: auto; padding-top: 92px; padding-bottom: 44px; }
+    .hero-logo { width: 140px; }
+    .scroll-hint { display: none; }
+  }
+
+  /* 超宽屏：正文不跟着拉长 */
+  @media (min-width: 1500px) {
+    section { padding-left: 0; padding-right: 0; }
+    .hero-sub { max-width: 720px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="rain"></canvas>
+
+<div class="statusbar">
+  <span class="left"><picture>
+    <source srcset="assets/KOKUU-logo-ink.webp" type="image/webp">
+    <img class="bar-logo" src="assets/KOKUU-logo-ink.png" alt="">
+  </picture><b>KOKUU.ORG</b> — 谷雨工作室</span>
+  <span class="right"></span>
+  <span class="right">EST.2026</span>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <picture>
+      <source srcset="assets/KOKUU-logo-ink.webp" type="image/webp">
+      <img class="hero-logo" id="logo" src="assets/KOKUU-logo-ink.png" alt="KOKUU 谷雨工作室标志：敞口立方体上升起云，落下雨滴">
+    </picture>
+    <p class="hero-id">KOKUU 谷雨工作室 · kokuu.org</p>
+    <h1>雨落下之后<br><span class="stroke">就交给时间</span></h1>
+    <p class="hero-en">AFTER THE RAIN · LEAVE IT TO TIME</p>
+    <p class="hero-sub">
+      几个人的小工作室，现在做三件事：<br>
+      <b>Minecraft 服务器运营 · 皮肤站与登录验证 · AI 变声器模型交付。</b><br>
+      服务器不商业化，大家一起玩 —— 用爱发电。
+    </p>
+    <div class="scroll-hint">↓ 往下 ↓</div>
+  </header>
+
+  <!-- 像素小人闯关 -->
+  <canvas class="stage-band" id="stage" aria-label="像素小人闯关动画，天在下雨" role="img"></canvas>
+
+  <!-- 业务 -->
+  <section id="work">
+    <div class="sec-head reveal">
+      <span class="sec-num">01 /</span>
+      <h2 class="sec-title">我们在做什么<span class="stroke">（就三件）</span></h2>
+      <span class="sec-note">WHAT WE DO — 目前三项，没别的了</span>
+    </div>
+    <div class="stickers">
+      <div class="sticker main reveal" style="--rot:-2.2deg; --c:var(--rain)">
+        <div class="s-num">01 · 主营</div>
+        <h3>Minecraft 服务器</h3>
+        <div class="s-en">MC SERVER</div>
+        <p>一个一起玩的地方。<b>不商业化、不卖道具、不搞氪金</b> —— 服务器长期在线，维护我们自己扛，靠的是用爱发电。</p>
+      </div>
+      <div class="sticker reveal" style="--rot:1.6deg; --c:var(--haze)">
+        <div class="s-num">02</div>
+        <h3>皮肤站</h3>
+        <div class="s-en">SKIN SITE · AUTH</div>
+        <p>一个放皮肤的地方，同时提供登录验证服务。皮肤托管与分发、登录鉴权，接上就能用。</p>
+      </div>
+      <div class="sticker reveal" style="--rot:-1.4deg; --c:var(--rain)">
+        <div class="s-num">03</div>
+        <h3>AI 变声器</h3>
+        <div class="s-en">VOICE MODEL</div>
+        <p>成品模型交付。训练好的变声模型直接给你，拿来就能跑，不用自己从头炼一遍。</p>
+      </div>
+    </div>
+    <p class="m-foot reveal">目前就这三件。以后可能会多，也可能一直就这三件 —— 看我们还有没有新的奇怪想法。</p>
+  </section>
+
+  <!-- 我们怎么做 -->
+  <section id="how">
+    <div class="sec-head reveal">
+      <span class="sec-num">02 /</span>
+      <h2 class="sec-title">我们<span class="stroke">怎么做</span></h2>
+      <span class="sec-note">HOW WE WORK — 写在前面的丑话</span>
+    </div>
+    <div class="manifesto">
+      <div class="m-col no reveal">
+        <span class="m-tag">我们不 ✕</span>
+        <ul>
+          <li><span class="mark">✕</span>把用爱发电的事做成 KPI</li>
+          <li><span class="mark">✕</span>为了显得人多，开做不完的坑</li>
+          <li><span class="mark">✕</span>用术语盖住还没想清楚的方案</li>
+          <li><span class="mark">✕</span>把「勉强能跑」说成「已经上线」</li>
+        </ul>
+      </div>
+      <div class="m-col yes reveal">
+        <span class="m-tag">我们只 ✓</span>
+        <ul>
+          <li><span class="mark">✓</span>出问题第一时间讲清楚，不捂着</li>
+          <li><span class="mark">✓</span>一台机器能解决的事，不上三台</li>
+          <li><span class="mark">✓</span>留下一份别人看得懂的配置和文档</li>
+          <li><span class="mark">✓</span>把重复劳动写成脚本，一劳永逸</li>
+          <li><span class="mark">✓</span>做不到的，当场说做不到</li>
+        </ul>
+      </div>
+    </div>
+    <p class="m-foot reveal">小不是缺点。但小带来的限制，我们会提前讲清楚，而不是事后补救。</p>
+  </section>
+
+  <!-- 成员 -->
+  <section id="crew">
+    <div class="sec-head reveal">
+      <span class="sec-num">03 /</span>
+      <h2 class="sec-title">谁在<span class="stroke">做事</span></h2>
+      <span class="sec-note">THE CREW — 四个干活的人，和一个空位</span>
+    </div>
+    <div class="crew-grid">
+      <div class="crew reveal">
+        <span class="glyph">K</span>
+        <div class="role">服务器</div>
+        <div class="loc">守着世界不让它崩的人</div>
+      </div>
+      <div class="crew reveal">
+        <span class="glyph">O</span>
+        <div class="role">站点</div>
+        <div class="loc">让皮肤和登录都对得上的人</div>
+      </div>
+      <div class="crew reveal">
+        <span class="glyph">K</span>
+        <div class="role">模型</div>
+        <div class="loc">把声音炼成另一个人的</div>
+      </div>
+      <div class="crew reveal">
+        <span class="glyph">U</span>
+        <div class="role">打下手</div>
+        <div class="loc">哪里缺人就往哪去的</div>
+      </div>
+      <div class="crew locked reveal">
+        <span class="glyph">U</span>
+        <div class="role">空位</div>
+        <div class="loc">还没出现的人</div>
+      </div>
+    </div>
+    <p class="crew-note reveal">
+      第五个位置空着。<b>我们不发招聘启事 —— 先一起干点东西，再谈别的。</b>
+    </p>
+    <p class="crew-mail reveal">
+      想入伙 / 有事找我们 → <a class="mailto" href="mailto:hi@kokuu.org">hi@kokuu.org</a>
+    </p>
+  </section>
+
+  <!-- 页脚 -->
+  <footer>
+    <div class="foot-inner">
+      <div class="foot-left">
+        <picture>
+          <source srcset="assets/KOKUU-logo-ink.webp" type="image/webp">
+          <img class="f-logo" src="assets/KOKUU-logo-ink.png" alt="KOKUU logo" id="footLogo">
+        </picture>
+      </div>
+      <div class="foot-right">
+        AFTER THE RAIN · LEAVE IT TO TIME<br>
+        © 2026 KOKUU 谷雨工作室 · kokuu.org<br>
+        没有一个 Cookie，没有一份统计，只有一个页面。<br>
+        <span class="secret" id="secret">传闻：连点五下会下雨 —— logo 和下面那个小人都算。</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ============ 统一帧调度 + 性能自适应（老旧设备自动降质） ============ */
+window.__kk = (function () {
+  var items = [], running = false, lite = false, frames = 0, t0 = 0, prev = 0;
+  function loop(t) {
+    if (!running) return;
+    requestAnimationFrame(loop);
+    var dt = prev ? t - prev : 16.7;
+    prev = t;
+    if (dt > 120) dt = 16.7;                    // 切回标签页时不要跳一大步
+    if (document.hidden) return;                // 后台不画
+
+    if (!t0) t0 = t;
+    frames++;
+    if (t - t0 >= 1500) {                       // 每 1.5 秒评估一次帧率
+      if (!lite && frames * 1000 / (t - t0) < 38) lite = true;   // 掉帧就进省电模式
+      frames = 0; t0 = t;
+    }
+
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      var gap = it.gap;
+      if (lite && gap < 32) gap = 32;           // 省电模式：降到约 30fps
+      if (t - it.last < gap) continue;
+      it.last = t;
+      it.fn(dt);
+    }
+  }
+  document.addEventListener("visibilitychange", function () { prev = 0; });
+  return {
+    add: function (fn, gap) {
+      items.push({ fn: fn, last: 0, gap: gap || 0 });
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    },
+    lite: function () { return lite; }
+  };
+})();
+
+/* ============ 像素小人闯关 ============ */
+(function () {
+  const cv = document.getElementById("stage");
+  if (!cv || !cv.getContext) return;
+  const g = cv.getContext("2d");
+  const T = 16, VH = 88, SCALE = 2.6;
+  let VW = 320, camX = 0;
+  g.imageSmoothingEnabled = false;
+
+  const INK = "#2B1F52", RAIN = "#0FA3A3", HAZE = "#8B7FD4", PAPER = "#F5F3EE";
+  const GRAV = 0.42, JUMP = -5.2, JUMP_STEP = -3.8, SPD = 1.35;
+  const LOW = 72, HIGH = 56;                 // 地面顶 y：低地 / 高台
+
+  function resize() {
+    const cssW = cv.clientWidth || innerWidth;
+    const s = cssW < 700 ? 2.0 : 2.6;          // 窄屏缩小缩放，避免横幅过高
+    VW = Math.max(150, Math.round(cssW / s));
+    cv.width = VW; cv.height = VH;
+    cv.style.height = (VH * s) + "px";
+    g.imageSmoothingEnabled = false;
+  }
+  resize();
+  addEventListener("resize", resize);
+
+  const tiles = [];          // 地面顶部 y，999 = 坑
+  const PIT = 999;
+  function genTo(i) {
+    while (tiles.length <= i + 24) {
+      const last = tiles.length ? tiles[tiles.length - 1] : LOW;
+      const base = last === PIT ? LOW : last;
+      const r = Math.random();
+      if (r < 0.44) {                                   // 平地
+        const len = 4 + (Math.random() * 5 | 0);
+        for (let k = 0; k < len; k++) tiles.push(base);
+      } else if (r < 0.64) {                            // 台阶
+        const nh = Math.max(HIGH, Math.min(LOW, base + (Math.random() < .5 ? -T : T)));
+        const len = 2 + (Math.random() * 3 | 0);
+        for (let k = 0; k < len; k++) tiles.push(nh);
+      } else if (r < 0.80) {                            // 坑（只在低地，避免高台大跳出画面）
+        if (base === LOW) {
+          const len = 1 + (Math.random() * 2 | 0);
+          for (let k = 0; k < len; k++) tiles.push(PIT);
+          tiles.push(LOW);
+        } else {
+          const len = 3 + (Math.random() * 3 | 0);
+          for (let k = 0; k < len; k++) tiles.push(base);
+        }
+      } else {                                          // 高台（已经在高台就回到低地，避免一直卡在上面）
+        const nh = (base === HIGH) ? LOW : Math.max(HIGH, base - T);
+        const len = 3 + (Math.random() * 3 | 0);
+        for (let k = 0; k < len; k++) tiles.push(nh);
+      }
+    }
+  }
+  genTo(40);
+
+  const stars = [], parts = [];
+  function ensureStars(i) {
+    while (stars.length < i / 12) {
+      const idx = stars.length * 12 + 8;
+      genTo(idx + 4);
+      if (tiles[idx] !== PIT) stars.push({ idx, taken: false });
+      else stars.push({ idx, taken: true });
+    }
+  }
+  ensureStars(40);
+
+  const p = { x: 24, y: LOW, vy: 0, ground: false, f: 0 };
+  const drops = [];            // 场景里的雨（谷雨）
+  const ripples = [];
+  const clouds = [
+    { x: 10, y: 6, w: 14, sp: .28 }, { x: 80, y: 14, w: 10, sp: .2 },
+    { x: 150, y: 4, w: 16, sp: .34 }, { x: 210, y: 12, w: 8, sp: .22 },
+    { x: 260, y: 8, w: 12, sp: .26 }, { x: 320, y: 16, w: 9, sp: .18 }
+  ];
+
+  function px(x, y, w, h, c) { g.fillStyle = c; g.fillRect(x | 0, y | 0, w | 0, h | 0); }
+
+  function drawPlayer(sx, by) {
+    const f = Math.floor(p.f / 8) % 2;
+    const bob = (p.ground && f) ? -1 : 0;
+    const y = by - 13 + bob;
+    px(sx + 2, y, 6, 5, INK);          // 头
+    px(sx + 5, y + 2, 1, 1, PAPER);    // 眼
+    px(sx + 1, y + 5, 7, 2, RAIN);     // 围巾
+    px(sx + 2, y + 6, 5, 5, RAIN);     // 身
+    px(sx, y + 6 + (p.ground ? (f ? 1 : 0) : -1), 2, 3, INK);      // 臂
+    px(sx + 7, y + 6 + (p.ground ? (f ? 0 : 1) : -1), 2, 3, INK);
+    if (!p.ground) {                   // 空中
+      px(sx + 1, y + 11, 3, 3, INK); px(sx + 5, y + 12, 2, 2, INK);
+    } else if (f === 0) {
+      px(sx + 1, y + 11, 3, 3, INK); px(sx + 5, y + 10, 3, 4, INK);
+    } else {
+      px(sx + 1, y + 10, 3, 4, INK); px(sx + 5, y + 11, 3, 3, INK);
+    }
+  }
+
+  let boost = false;
+  cv.addEventListener("pointerenter", function () { boost = true; });
+  cv.addEventListener("pointerleave", function () { boost = false; });
+
+  function step(dt) {
+    const s = Math.max(.5, Math.min(3.5, (dt || 16.7) / 16.7));   // 帧率补偿：慢设备也不变慢动作
+    p.f += s;
+    const i = Math.floor(p.x / T);
+    genTo(i + 20); ensureStars(i + 20);
+    camX = p.x - VW * 0.32;
+
+    const here = tiles[i];
+    const next = tiles[i + 1];
+
+    p.vy += GRAV * s;
+    p.y += p.vy * s;
+    p.ground = false;
+
+    if (here !== PIT && p.y >= here && p.vy >= 0) { p.y = here; p.vy = 0; p.ground = true; }
+
+    if (p.ground && next === PIT) { p.vy = JUMP; p.ground = false; }                 // 跨坑：大跳
+    else if (p.ground && next !== PIT && next < here) { p.vy = JUMP_STEP; p.ground = false; }  // 上台阶：小跳
+
+    if (p.y > VH + 20) {                                  // 掉坑：回到下一个落脚点
+      let k = i;
+      genTo(i + 40);
+      while (k < tiles.length && tiles[k] === PIT) k++;
+      const land = (k < tiles.length && tiles[k] !== PIT) ? tiles[k] : LOW;
+      p.x = k * T + 8; p.y = land - 24; p.vy = 0;
+    }
+
+    p.x += SPD * (boost ? 1.35 : 1) * s;
+
+    for (let si = 0; si < stars.length; si++) {      // 用 si，避免遮蔽上面的帧率补偿系数 s
+      const st = stars[si];
+      if (st.taken) continue;
+      const sx = st.idx * T + 8, sy = tiles[st.idx] - 10;
+      if (Math.abs(p.x - sx) < 9 && Math.abs(p.y - sy) < 18) {
+        st.taken = true;
+        for (let k = 0; k < 5; k++) parts.push({ x: sx, y: sy, vx: (Math.random() - .5) * 2, vy: -Math.random() * 2, life: 22 });
+      }
+    }
+    for (let k = parts.length - 1; k >= 0; k--) {
+      const q = parts[k];
+      q.x += q.vx * s; q.y += q.vy * s; q.vy += .12 * s; q.life -= s;
+      if (q.life <= 0) parts.splice(k, 1);
+    }
+
+    const heavy = document.body.classList.contains("storm");      // 场景里的雨（细一点、少一点）
+    const cap = window.__kk.lite() ? 34 : 68;
+    const want = heavy ? 4 : 1;
+    for (let k = 0; k < want; k++) {
+      if (drops.length > cap) break;
+      if (heavy || Math.random() < .55) {
+        drops.push({ x: camX + Math.random() * VW, y: -Math.random() * 44, vy: (2.0 + Math.random() * 1.8) });
+      }
+    }
+    for (let k = drops.length - 1; k >= 0; k--) {
+      const d = drops[k];
+      d.y += d.vy * s;
+      const gi = Math.floor(d.x / T);
+      const gy = (gi >= 0 && tiles[gi] !== undefined && tiles[gi] !== PIT) ? tiles[gi] : VH;
+      if (d.y >= gy) { ripples.push({ x: d.x, y: gy, r: 1, life: 12 }); drops.splice(k, 1); }
+      else if (d.y > VH + 8) drops.splice(k, 1);
+    }
+    for (let k = ripples.length - 1; k >= 0; k--) {
+      const r = ripples[k];
+      r.r += .55 * s; r.life -= s;
+      if (r.life <= 0) ripples.splice(k, 1);
+    }
+  }
+
+  function render() {
+    const cam = p.x - VW * 0.32;
+    g.clearRect(0, 0, VW, VH);
+
+    for (let c = 0; c < clouds.length; c++) {              // 云（视差）
+      const cl = clouds[c];
+      let sx = cl.x - cam * cl.sp;
+      sx = ((sx % (VW + 40)) + VW + 40) % (VW + 40) - 20;
+      px(sx, cl.y, cl.w, 3, INK);
+      px(sx + 3, cl.y - 2, cl.w - 6, 2, INK);
+    }
+
+    const base = 50 - (cam * .45) % 24;                    // 远山（视差）
+    for (let k = -1; k < Math.ceil(VW / 24) + 2; k++) {
+      const h = 8 + ((k % 3 === 0) ? 8 : (k % 3 === 1 ? 4 : 0));
+      px(k * 24 + base, VH - 14 - h, 22, h + 14, "rgba(139,127,212,.30)");
+    }
+
+    const i0 = Math.floor(cam / T) - 1;
+    const iN = Math.ceil(VW / T) + 2;
+    for (let i = i0; i < i0 + iN; i++) {                   // 地面
+      if (i < 0) continue;
+      const gy = tiles[i];
+      if (gy === PIT || gy === undefined) continue;
+      const sx = i * T - cam;
+      px(sx, gy, T, 3, RAIN);                              // 草顶
+      px(sx, gy + 3, T, VH - gy - 3, INK);                 // 土
+      px(sx + 3, gy + 8, 2, 2, "rgba(245,243,238,.16)");   // 斑驳
+    }
+
+    for (let k = 0; k < drops.length; k++) {               // 场景里的雨（细线）
+      const d = drops[k];
+      px(d.x - cam, d.y, 1, 2, RAIN);
+    }
+    for (let k = 0; k < ripples.length; k++) {             // 落地涟漪
+      const r = ripples[k];
+      px(r.x - cam - r.r, r.y + 1, r.r * 2, 1, RAIN);
+    }
+
+    for (let s = 0; s < stars.length; s++) {               // 星星
+      const st = stars[s];
+      if (st.taken) continue;
+      const sx = st.idx * T + 8 - cam;
+      if (sx < -10 || sx > VW + 10) continue;
+      const sy = tiles[st.idx] - 12 + (Math.sin(p.f / 12 + s) * 1.5 | 0);
+      px(sx - 2, sy + 2, 5, 1, INK); px(sx - 1, sy + 1, 3, 3, INK);
+      px(sx, sy + 2, 1, 1, PAPER);
+    }
+
+    for (let f = 0; f < 3; f++) {                          // 关卡旗
+      const fi = (Math.floor(p.x / (T * 30)) + f) * 30;
+      if (fi < 0) continue;
+      const gy = tiles[fi];
+      if (gy === PIT || gy === undefined) continue;
+      const sx = fi * T + 4 - cam;
+      if (sx < -20 || sx > VW + 20) continue;
+      px(sx, gy - 20, 1, 20, INK);
+      px(sx + 1, gy - 20, 6, 5, RAIN);
+      px(sx + 1, gy - 15, 6, 1, PAPER);
+    }
+
+    for (let k = 0; k < parts.length; k++) {               // 吃星星的碎屑
+      const q = parts[k];
+      px(q.x - cam, q.y, 2, 2, RAIN);
+    }
+
+    drawPlayer(p.x - cam, p.y);
+  }
+
+  let onScreen = true;
+  if (typeof IntersectionObserver === "function") {          // 滚出视口就停，省电
+    new IntersectionObserver(function (en) { onScreen = en[0] ? en[0].isIntersecting : true; }).observe(cv);
+  }
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    step(16.7); render();
+    return;
+  }
+  window.__kk.add(function (dt) { if (onScreen) { step(dt); render(); } });
+})();
+
+(function () {
+  "use strict";
+
+  /* ============ 雨 ============ */
+  const canvas = document.getElementById("rain");
+  const ctx = canvas.getContext("2d");
+  let W, H, DPR = 1;
+  function dpr() { return window.__kk.lite() ? 1 : Math.min(devicePixelRatio || 1, 2); }  // 上限 2，省电模式 1
+  function resize() {
+    DPR = dpr();
+    W = canvas.width = Math.round(innerWidth * DPR);
+    H = canvas.height = Math.round(innerHeight * DPR);
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+  }
+  resize();
+  addEventListener("resize", resize);
+
+  const drops = [], rings = [];
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function cap() { return window.__kk.lite() ? 26 : (document.body.classList.contains("storm") ? 70 : 42); }
+
+  function spawnDrop(x, y, boost) {
+    if (y === undefined) y = -Math.random() * 180 * DPR;      // 环境雨从画面上方落下
+    if (drops.length > cap()) return;                          // 硬上限，防止堆积
+    drops.push({
+      x, y,
+      vy: (2.0 + Math.random() * 2.0) * DPR * (boost ? 1.4 : 1),
+      len: (6 + Math.random() * 10) * DPR,                     // 短一点、细一点
+      targetY: y + (140 + Math.random() * 420) * DPR
+    });
+  }
+
+  let storm = 0;
+  function ambient(dt) {
+    if (reduced) return;
+    const s = Math.max(.5, Math.min(3.5, (dt || 16.7) / 16.7));
+    const rate = storm > 0 ? 2.2 : .5;                          // 每秒约 30 滴 / 8 滴
+    let n = rate * s;
+    while (n > 0) {
+      if (n >= 1 || Math.random() < n) spawnDrop(Math.random() * W);
+      n -= 1;
+    }
+  }
+
+  function loop(dt) {
+    if (DPR !== dpr()) resize();                 // 进入省电模式后自动降分辨率
+    ambient(dt);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = "round";
+
+    const s = Math.max(.5, Math.min(3.5, (dt || 16.7) / 16.7));
+
+    for (let i = drops.length - 1; i >= 0; i--) {
+      const d = drops[i];
+      d.y += d.vy * s;
+      const a = Math.max(0, Math.min(.42, (d.targetY - d.y) / (140 * DPR) * .42));
+      ctx.strokeStyle = "rgba(15,163,163," + a.toFixed(3) + ")";
+      ctx.lineWidth = 1.2 * DPR;
+      ctx.beginPath(); ctx.moveTo(d.x, d.y - d.len); ctx.lineTo(d.x, d.y); ctx.stroke();
+
+      if (d.y >= d.targetY) {
+        rings.push({ x: d.x, y: d.targetY, r: 1, a: .34 });
+        drops.splice(i, 1);
+      }
+    }
+
+    for (let i = rings.length - 1; i >= 0; i--) {   // 涟漪用横线画，不用 ellipse（老 WebView 更稳）
+      const r = rings[i];
+      r.r += .9 * DPR * s;
+      r.a *= .92;
+      if (r.a < .012 || r.r > 16 * DPR) { rings.splice(i, 1); continue; }
+      ctx.strokeStyle = "rgba(43,31,82," + r.a.toFixed(3) + ")";
+      ctx.lineWidth = 1 * DPR;
+      ctx.beginPath(); ctx.moveTo(r.x - r.r, r.y); ctx.lineTo(r.x + r.r, r.y); ctx.stroke();
+    }
+  }
+  window.__kk.add(loop);
+
+  let lastMove = 0;
+  addEventListener("pointermove", function (e) {
+    if (reduced) return;
+    const now = performance.now();
+    if (now - lastMove < 55) return;
+    lastMove = now;
+    if (Math.random() < .4) spawnDrop(e.clientX * DPR, e.clientY * DPR);
+  }, { passive: true });
+
+  addEventListener("pointerdown", function (e) {
+    if (reduced) return;
+    for (let i = 0; i < 8; i++) {
+      setTimeout(function () {
+        spawnDrop((e.clientX + (Math.random() - .5) * 120) * DPR,
+                  (e.clientY - Math.random() * 180) * DPR);
+      }, i * 40);
+    }
+  }, { passive: true });
+
+  /* ============ 彩蛋：连点 logo 五下 ============ */
+  const secret = document.getElementById("secret");
+  let clicks = 0, clickTimer = null;
+  function onEgg() {
+    clicks++;
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(function () { clicks = 0; }, 1600);
+    if (clicks >= 5) {
+      clicks = 0;
+      storm = 240;
+      document.body.classList.add("storm");
+      secret.textContent = "好吧，被你找到了。这就是我们的天气预报系统。";
+      const stop = setInterval(function () {
+        storm--;
+        if (storm <= 0) { clearInterval(stop); document.body.classList.remove("storm"); }
+      }, 16);
+    }
+  }
+  ["logo", "stage"].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", onEgg);
+  });
+
+  /* ============ 滚动显现 ============ */
+  const revealEls = document.querySelectorAll(".reveal");
+  if (typeof IntersectionObserver === "function") {
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("on"); io.unobserve(en.target); }
+      });
+    }, { threshold: .12 });
+    for (let i = 0; i < revealEls.length; i++) io.observe(revealEls[i]);
+  } else {
+    for (let i = 0; i < revealEls.length; i++) revealEls[i].classList.add("on");   // 老 WebView 直接显示
+  }
+
+  /* ============ 标题乱码解码 ============ */
+  const CHARS = "KOKUU谷雨云*#%&@RAIN01";
+  document.querySelectorAll(".sec-title, .hero h1").forEach(function (el) {
+    const original = el.dataset.orig || (el.dataset.orig = el.innerHTML);
+    let raf = null;
+    el.addEventListener("pointerenter", function () {
+      if (reduced) return;
+      let frame = 0;
+      cancelAnimationFrame(raf);
+      const plain = el.textContent;
+      (function scramble() {
+        frame++;
+        const reveal = Math.floor(frame / 2);
+        el.textContent = plain.split("").map(function (ch, i) {
+          if (ch === " " || ch === "\n") return ch;
+          return i < reveal ? ch : CHARS[Math.floor(Math.random() * CHARS.length)];
+        }).join("");
+        if (reveal < plain.length) raf = requestAnimationFrame(scramble);
+        else el.innerHTML = original;
+      })();
+    });
+    el.addEventListener("pointerleave", function () {
+      cancelAnimationFrame(raf);
+      el.innerHTML = original;
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
