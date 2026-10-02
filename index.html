@@ -98,16 +98,12 @@
     /* 两行都不带末尾标点：全角「，/。」的墨迹偏左 0.33em，
        带了会让整块视觉左移；不加标点则任何字体下都真正居中 */
   }
-  /* 第二行：空心描边（无填充）。
-     空心填充用专属性 -webkit-text-fill-color（而非 color:transparent）——
-     后者在部分安卓 OEM 内核(OPPO/ColorOS)有渲染 bug 会让文字消失或糊掉。
-     描边用 -webkit-text-stroke（text-shadow 多方向会填满中文字怀→变加粗实心，不可用）。
-     color 保留实心兜底：万一某内核不认 text-fill-color，降级为实心雨青字仍可读。 */
-  .hero h1 .stroke {
-    color: var(--rain);                        /* 兜底 */
-    -webkit-text-fill-color: transparent;      /* 空心填充（专属性，兼容安卓） */
-    -webkit-text-stroke: 1.4px var(--ink);
-  }
+  /* 第二行改实心雨青，不再用空心描边。
+     原因：中文 900 字重 + 空心描边在手机高分屏上笔画空白(字怀)太小，
+     描边一压就发糊/发虚；OPPO/ColorOS 等安卓内核对 text-stroke 组合也不稳定。
+     已试 color:transparent / text-stroke / text-shadow 三种空心实现均不稳。
+     实心 + 颜色分层在任何设备都 100% 清晰，两行层次靠墨色/雨青对比保留。 */
+  .hero h1 .stroke { color: var(--rain); }
   .hero-en {
     margin-top: 16px;
     font-family: var(--mono); font-size: clamp(10px, 1.5vw, 13px);
@@ -147,11 +143,7 @@
   .sec-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 52px; flex-wrap: wrap; }
   .sec-num { font-family: var(--mono); font-size: 13px; color: var(--rain); letter-spacing: .15em; }
   .sec-title { font-size: clamp(28px, 5vw, 48px); font-weight: 900; letter-spacing: .04em; }
-  .sec-title .stroke {
-    color: var(--rain);                        /* 兜底 */
-    -webkit-text-fill-color: transparent;      /* 空心填充（专属性，兼容安卓） */
-    -webkit-text-stroke: 1.2px var(--ink);
-  }
+  .sec-title .stroke { color: var(--rain); }   /* 实心雨青，手机端可靠 */
   .sec-note { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-50); letter-spacing: .1em; }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
