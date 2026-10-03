@@ -194,6 +194,12 @@
   .sticker .s-en { font-family: var(--mono); font-size: 11px; letter-spacing: .22em; color: var(--ink-50); margin-bottom: 14px; }
   .sticker p { font-size: 14.5px; line-height: 1.9; color: #463c6b; }
   .sticker p b { color: var(--ink); font-weight: 700; }
+  .sticker .s-act {
+    margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line);
+    font-family: var(--mono); font-size: 12px; color: var(--ink-50);
+  }
+  .sticker .s-act a { color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--c); padding-bottom: 1px; }
+  .sticker .s-act a:hover { color: var(--c); border-bottom-style: solid; }
   .sticker.main { box-shadow: 8px 8px 0 var(--rain); }
 
   /* ---------- 成员 ---------- */
@@ -254,38 +260,28 @@
   .place .p-d { font-family: var(--mono); font-size: 12px; color: var(--ink-50); line-height: 1.8; word-break: break-word; }
 
   /* ---------- 造过的东西 ---------- */
-  .repos { display: flex; flex-direction: column; gap: 14px; }
-  .repo {
-    display: flex; align-items: flex-start; gap: 20px; text-decoration: none; color: var(--ink);
-    background: var(--card); border: 1px solid rgba(43,31,82,.1);
-    padding: 22px 24px; transition: transform .22s, box-shadow .22s, border-color .22s;
+  .repos { border-top: 1px dashed var(--line); }
+  .repo-row {
+    display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+    padding: 18px 0; border-bottom: 1px dashed var(--line);
   }
-  .repo:hover { transform: translateX(6px); box-shadow: -5px 0 0 var(--rain); border-color: rgba(15,163,163,.4); }
-  .repo .r-ic {
-    flex: 0 0 auto; width: 46px; height: 46px; margin-top: 2px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: 19px; font-weight: 900; color: #fff;
-    background: var(--rain); border-radius: 3px;
+  .repo-row .r-key {
+    flex: 0 0 auto; width: 76px;
+    font-size: 15px; font-weight: 900; color: var(--ink);
   }
-  .repo.haze .r-ic { background: var(--haze); }
-  .repo.ink .r-ic { background: var(--ink); }
-  .repo .r-body { min-width: 0; flex: 1; }
-  .repo .r-name { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: .02em; }
-  .repo .r-name .r-arrow { color: var(--rain); margin-left: 6px; opacity: 0; transition: opacity .2s, transform .2s; display: inline-block; }
-  .repo:hover .r-name .r-arrow { opacity: 1; transform: translateX(3px); }
-  .repo .r-desc { font-size: 14px; line-height: 1.85; color: #463c6b; margin-top: 5px; }
-  .repo .r-tag {
-    display: inline-block; margin-top: 9px;
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
-    color: var(--ink-50); border: 1px dashed var(--line); padding: 2px 8px;
+  .repo-row .r-key::before { content: ""; display: inline-block; width: 8px; height: 8px; background: var(--rain); margin-right: 8px; }
+  .repo-row .r-list { flex: 1 1 300px; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px 10px; }
+  .repo-row .r-list a {
+    font-family: var(--mono); font-size: 13px; text-decoration: none;
+    color: var(--ink); background: rgba(15,163,163,.08);
+    border: 1px solid rgba(15,163,163,.24); padding: 3px 9px;
+    transition: background .18s, color .18s, border-color .18s;
+    word-break: break-all;
   }
-  .repo-group {
-    font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: var(--rain);
-    margin: 30px 0 4px; padding-left: 2px;
-  }
-  .repo-group:first-child { margin-top: 0; }
+  .repo-row .r-list a:hover { background: var(--rain); border-color: var(--rain); color: #fff; }
+  .repo-row .r-note { flex: 0 0 auto; font-family: var(--mono); font-size: 11.5px; color: var(--ink-50); letter-spacing: .06em; }
   .repo-note {
-    margin-top: 34px; font-family: var(--mono); font-size: 13px; line-height: 2;
+    margin-top: 30px; font-family: var(--mono); font-size: 13px; line-height: 2;
     color: var(--ink-50); text-align: center; letter-spacing: .06em;
   }
   .repo-note a { color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--rain); padding-bottom: 1px; }
@@ -335,11 +331,11 @@
     .howto-col li::before { width: 23px; height: 23px; line-height: 23px; font-size: 11px; }
     .places { gap: 14px; }
     .place { padding: 20px 16px; }
-    .repo { gap: 14px; padding: 18px 16px; }
-    .repo .r-ic { width: 38px; height: 38px; font-size: 16px; }
-    .repo .r-name { font-size: 13.5px; }
-    .repo .r-desc { font-size: 13px; }
-    .repo-group { margin-top: 24px; }
+    .repo-row { gap: 10px; padding: 15px 0; }
+    .repo-row .r-key { width: auto; font-size: 14px; }
+    .repo-row .r-list { flex: 1 1 100%; }
+    .repo-row .r-note { width: 100%; }
+    .sticker .s-act { font-size: 11.5px; }
     .crew-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 14px; }
     .crew .glyph { font-size: 40px; margin-bottom: 10px; }
     .crew .role { font-size: 14px; }
@@ -416,96 +412,30 @@
         <h3>Minecraft 服务器</h3>
         <div class="s-en">MC SERVER</div>
         <p>一个一起玩的地方。<b>不商业化、不卖道具、不搞氪金</b> —— 服务器长期在线，维护我们自己扛，靠的是用爱发电。</p>
+        <div class="s-act">地址不公开，写信给你 → <a class="mailto" href="mailto:hi@kokuu.org">hi@kokuu.org</a></div>
       </div>
       <div class="sticker reveal" style="--rot:1.6deg; --c:var(--haze)">
         <div class="s-num">02</div>
         <h3>皮肤站</h3>
         <div class="s-en">SKIN SITE · AUTH</div>
         <p>一个放皮肤的地方，同时提供登录验证服务。皮肤托管与分发、登录鉴权，接上就能用。</p>
+        <div class="s-act"><a href="https://auth.kokuu.org" target="_blank" rel="noopener">auth.kokuu.org</a> 注册即用</div>
       </div>
       <div class="sticker reveal" style="--rot:-1.4deg; --c:var(--rain)">
         <div class="s-num">03</div>
         <h3>AI 变声器</h3>
         <div class="s-en">VOICE MODEL</div>
         <p>成品模型交付。训练好的变声模型直接给你，拿来就能跑，不用自己从头炼一遍。</p>
+        <div class="s-act">说要哪种声音，我们练好给你</div>
       </div>
     </div>
-    <p class="m-foot reveal">目前就这三件。以后可能会多，也可能一直就这三件 —— 看我们还有没有新的奇怪想法。</p>
-  </section>
-
-  <!-- 怎么开始 -->
-  <section id="start">
-    <div class="sec-head reveal">
-      <span class="sec-num">02 /</span>
-      <h2 class="sec-title">怎么<span class="stroke">开始</span></h2>
-      <span class="sec-note">HOW TO START — 三步以内，不用写申请</span>
-    </div>
-    <div class="howto">
-      <div class="howto-col reveal">
-        <h3>想进服务器玩</h3>
-        <div class="h-en">JOIN THE SERVER</div>
-        <ol>
-          <li>写信到 <a class="mailto" href="mailto:hi@kokuu.org">hi@kokuu.org</a>，说一声你想来</li>
-          <li>我们把地址和规矩发给你 —— 没有审核面试，进门直接造</li>
-          <li>不收费、不卖道具。玩不下去随时走，服务器不会拦你</li>
-        </ol>
-      </div>
-      <div class="howto-col reveal">
-        <h3>想用皮肤站</h3>
-        <div class="h-en">USE THE SKIN SITE</div>
-        <ol>
-          <li>去 <a class="mailto" href="https://auth.kokuu.org">auth.kokuu.org</a> 注册一个号</li>
-          <li>上传你的皮肤，拿一个 ID —— 托管和分发都在这儿</li>
-          <li>要登录验证的话，同一个站点直接把鉴权也接上</li>
-        </ol>
-      </div>
-      <div class="howto-col reveal">
-        <h3>想要变声器模型</h3>
-        <div class="h-en">GET A VOICE MODEL</div>
-        <ol>
-          <li>写信告诉我们你要哪种声音、拿来做什么</li>
-          <li>我们交付<b>训练好的成品模型</b>，不是教程也不是半成品</li>
-          <li>拿到就能跑。不好用就直说，我们回去改</li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <!-- 常去的地方 -->
-  <section id="places">
-    <div class="sec-head reveal">
-      <span class="sec-num">03 /</span>
-      <h2 class="sec-title">常去的<span class="stroke">地方</span></h2>
-      <span class="sec-note">PLACES — 都在 kokuu.org 底下</span>
-    </div>
-    <div class="places">
-      <a class="place reveal" href="https://auth.kokuu.org" target="_blank" rel="noopener">
-        <div class="p-k">SKIN SITE</div>
-        <div class="p-n">皮肤站</div>
-        <div class="p-d">auth.kokuu.org<br>上传皮肤 / 登录验证</div>
-      </a>
-      <a class="place reveal" href="https://chat.kokuu.org" target="_blank" rel="noopener">
-        <div class="p-k">FORUM</div>
-        <div class="p-n">论坛</div>
-        <div class="p-d">chat.kokuu.org<br>聊闲天 / 提建议 / 找人</div>
-      </a>
-      <a class="place reveal" href="mailto:hi@kokuu.org">
-        <div class="p-k">EMAIL</div>
-        <div class="p-n">写信给我们</div>
-        <div class="p-d">hi@kokuu.org<br>人少，回得慢，但都看</div>
-      </a>
-      <div class="place reveal">
-        <div class="p-k">MINECRAFT</div>
-        <div class="p-n">服务器地址</div>
-        <div class="p-d">不写在页面上<br>写信给你 —— 免得被扫描</div>
-      </div>
-    </div>
+    <p class="m-foot reveal">服务器地址不写在页面上 —— 免得被扫描。想来就写信，我们发给你。</p>
   </section>
 
   <!-- 我们怎么做 -->
   <section id="how">
     <div class="sec-head reveal">
-      <span class="sec-num">04 /</span>
+      <span class="sec-num">02 /</span>
       <h2 class="sec-title">我们<span class="stroke">怎么做</span></h2>
       <span class="sec-note">HOW WE WORK — 写在前面的丑话</span>
     </div>
@@ -536,7 +466,7 @@
   <!-- 成员 -->
   <section id="crew">
     <div class="sec-head reveal">
-      <span class="sec-num">05 /</span>
+      <span class="sec-num">03 /</span>
       <h2 class="sec-title">谁在<span class="stroke">做事</span></h2>
       <span class="sec-note">THE CREW — 四个干活的人，和一个空位</span>
     </div>
@@ -578,85 +508,40 @@
   <!-- 造过的东西 -->
   <section id="repos">
     <div class="sec-head reveal">
-      <span class="sec-num">06 /</span>
+      <span class="sec-num">04 /</span>
       <h2 class="sec-title">造过的<span class="stroke">东西</span></h2>
-      <span class="sec-note">ON GITHUB — 大部分开源，代码随便看</span>
+      <span class="sec-note">ON GITHUB — 开源，代码随便看</span>
     </div>
-    <div class="repos">
-
-      <p class="repo-group reveal">皮肤站 KOKUUSKIN</p>
-      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-skin-server" target="_blank" rel="noopener">
-        <span class="r-ic">S</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-skin-server<span class="r-arrow">→</span></div>
-          <div class="r-desc">皮肤站服务端本体。基于开源的 Blessing Skin 6.0 自建部署，撑起整个 KokuuSkin —— 注册、皮肤管理、披风分发都在这儿。</div>
-          <span class="r-tag">PHP · BLESSING SKIN 6.0</span>
+    <div class="repos reveal">
+      <div class="repo-row">
+        <div class="r-key">皮肤站</div>
+        <div class="r-list">
+          <a href="https://github.com/KokuuStudio/kokuu-skin-server" target="_blank" rel="noopener">kokuu-skin-server</a>
+          <a href="https://github.com/KokuuStudio/kokuu-home" target="_blank" rel="noopener">kokuu-home</a>
+          <a href="https://github.com/KokuuStudio/kokuu-ui" target="_blank" rel="noopener">kokuu-ui</a>
+          <a href="https://github.com/KokuuStudio/kokuu-quote" target="_blank" rel="noopener">kokuu-quote</a>
         </div>
-      </a>
-      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-home" target="_blank" rel="noopener">
-        <span class="r-ic">H</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-home<span class="r-arrow">→</span></div>
-          <div class="r-desc">全站主题与可自定义首页。像素网格纹理、方块粒子、六张 MC 场景自动轮播 —— 皮肤站那张脸是他。</div>
-          <span class="r-tag">CSS · PLUGIN</span>
+        <div class="r-note">服务端 · 全站主题 · 后台重塑 · 一言</div>
+      </div>
+      <div class="repo-row">
+        <div class="r-key">论坛</div>
+        <div class="r-list">
+          <a href="https://github.com/KokuuStudio/kokuu-forum" target="_blank" rel="noopener">kokuu-forum</a>
+          <a href="https://github.com/KokuuStudio/kokuu-forum-points" target="_blank" rel="noopener">kokuu-forum-points</a>
+          <a href="https://github.com/KokuuStudio/kokuu-credit" target="_blank" rel="noopener">kokuu-credit</a>
         </div>
-      </a>
-      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-ui" target="_blank" rel="noopener">
-        <span class="r-ic">U</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-ui<span class="r-arrow">→</span></div>
-          <div class="r-desc">后台界面重塑。把用户中心、皮肤库、管理后台从 AdminLTE 原味改成同一套视觉语言 —— 登录后看到的每一页。</div>
-          <span class="r-tag">CSS · PLUGIN</span>
+        <div class="r-note">聚合卡片 · 积分互通 · 唯一账本</div>
+      </div>
+      <div class="repo-row">
+        <div class="r-key">这个站</div>
+        <div class="r-list">
+          <a href="https://github.com/KokuuStudio/kokuu-site" target="_blank" rel="noopener">kokuu-site</a>
         </div>
-      </a>
-      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-quote" target="_blank" rel="noopener">
-        <span class="r-ic">Q</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-quote<span class="r-arrow">→</span></div>
-          <div class="r-desc">提瓦特一言。后台顶栏每天换一条短句，点一下就换。少数人是为了这个天天登录的。</div>
-          <span class="r-tag">CSS · PLUGIN</span>
-        </div>
-      </a>
-
-      <p class="repo-group reveal">论坛 FLARUM</p>
-      <a class="repo haze reveal" href="https://github.com/KokuuStudio/kokuu-forum" target="_blank" rel="noopener">
-        <span class="r-ic">F</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-forum<span class="r-arrow">→</span></div>
-          <div class="r-desc">论坛聚合。在皮肤站仪表盘里放一块论坛卡片，直接看最新讨论；顺便接管了内核原有的公告位 —— 换成置顶指定帖。</div>
-          <span class="r-tag">PHP · FLARUM CARD</span>
-        </div>
-      </a>
-      <a class="repo haze reveal" href="https://github.com/KokuuStudio/kokuu-forum-points" target="_blank" rel="noopener">
-        <span class="r-ic">P</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-forum-points<span class="r-arrow">→</span></div>
-          <div class="r-desc">论坛赚积分 + 账号互通。发帖回帖产生加分，签名推给皮肤站记账；也能用皮肤站账号一键登录论坛。只加分，不扣分。</div>
-          <span class="r-tag">PHP · OAUTH2 CLIENT</span>
-        </div>
-      </a>
-      <a class="repo haze reveal" href="https://github.com/KokuuStudio/kokuu-credit" target="_blank" rel="noopener">
-        <span class="r-ic">C</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-credit<span class="r-arrow">→</span></div>
-          <div class="r-desc">积分账本 + 账号互通的服务端。唯一的事实来源在这儿，论坛那边只读余额 —— 账本只有一份，两边就不会对不上。</div>
-          <span class="r-tag">PHP · OAUTH2 SERVER</span>
-        </div>
-      </a>
-
-      <p class="repo-group reveal">这个站</p>
-      <a class="repo ink reveal" href="https://github.com/KokuuStudio/kokuu-site" target="_blank" rel="noopener">
-        <span class="r-ic">K</span>
-        <div class="r-body">
-          <div class="r-name">KokuuStudio/kokuu-site<span class="r-arrow">→</span></div>
-          <div class="r-desc">你现在站的这个页面。单文件、零依赖、零 Cookie、零统计。往下滚还能看到那些雨 —— 那是 Canvas 画的。</div>
-          <span class="r-tag">HTML · CANVAS</span>
-        </div>
-      </a>
+        <div class="r-note">你现在站的页面</div>
+      </div>
     </div>
     <p class="repo-note reveal">
-      上面这些都能翻，密码和私钥当然不在里面。<br>
-      想接着写或者想拆一个自己用 → <a href="https://github.com/KokuuStudio" target="_blank" rel="noopener">github.com/KokuuStudio</a>
+      都能翻，密码和私钥当然不在里面 → <a href="https://github.com/KokuuStudio" target="_blank" rel="noopener">github.com/KokuuStudio</a>
     </p>
   </section>
 
