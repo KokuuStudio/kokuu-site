@@ -222,6 +222,51 @@
   }
   .mailto:hover { color: var(--rain); border-bottom-style: solid; }
 
+  /* ---------- 怎么开始 ---------- */
+  .howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
+  .howto-col { border: 1px dashed var(--line); padding: 28px 24px 18px; background: rgba(255,255,255,.55); }
+  .howto-col h3 { font-size: 19px; font-weight: 900; }
+  .howto-col .h-en { font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: var(--ink-50); margin: 4px 0 16px; }
+  .howto-col ol { list-style: none; counter-reset: step; }
+  .howto-col li {
+    counter-increment: step; position: relative;
+    font-size: 14.5px; line-height: 1.9; color: #463c6b;
+    padding: 9px 0 9px 40px; border-bottom: 1px dashed rgba(43,31,82,.12);
+  }
+  .howto-col li:last-child { border-bottom: 0; }
+  .howto-col li::before {
+    content: counter(step); position: absolute; left: 0; top: 9px;
+    width: 25px; height: 25px; border-radius: 50%;
+    background: var(--rain); color: #fff;
+    font-family: var(--mono); font-size: 12px; line-height: 25px; text-align: center;
+  }
+
+  /* ---------- 常去的地方 ---------- */
+  .places { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 20px; }
+  .place {
+    display: block; text-decoration: none; color: var(--ink);
+    background: var(--card); border: 1px solid rgba(43,31,82,.1);
+    padding: 24px 20px; transition: transform .25s, box-shadow .25s;
+  }
+  .place:hover { transform: translateY(-5px); box-shadow: 5px 7px 0 var(--rain); }
+  .place .p-k { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--rain); }
+  .place .p-n { font-size: 18px; font-weight: 900; margin: 6px 0 3px; }
+  .place .p-d { font-family: var(--mono); font-size: 12px; color: var(--ink-50); line-height: 1.8; word-break: break-word; }
+
+  /* ---------- 常见问题 ---------- */
+  .faq { border-top: 1px dashed var(--line); }
+  .faq details { border-bottom: 1px dashed var(--line); }
+  .faq summary {
+    list-style: none; cursor: pointer;
+    font-size: clamp(15px, 2.3vw, 18px); font-weight: 700;
+    padding: 20px 0; display: flex; align-items: center; gap: 16px;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; margin-left: auto; font-family: var(--mono); color: var(--rain); font-size: 20px; font-weight: 400; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq .faq-a { font-size: 14.5px; line-height: 1.95; color: #463c6b; padding: 0 0 20px; }
+  .faq .faq-a b { color: var(--ink); }
+
   /* ---------- 页脚 ---------- */
   footer {
     border-top: 1px dashed var(--line);
@@ -260,6 +305,13 @@
     .m-col { padding: 28px 20px; }
     .m-col li { font-size: 15px; line-height: 2; }
     .stickers { gap: 22px; }
+    .howto { gap: 22px; }
+    .howto-col { padding: 24px 18px 14px; }
+    .howto-col li { font-size: 14px; padding-left: 36px; }
+    .howto-col li::before { width: 23px; height: 23px; line-height: 23px; font-size: 11px; }
+    .places { gap: 14px; }
+    .place { padding: 20px 16px; }
+    .faq summary { padding: 17px 0; }
     .crew-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 14px; }
     .crew .glyph { font-size: 40px; margin-bottom: 10px; }
     .crew .role { font-size: 14px; }
@@ -353,10 +405,79 @@
     <p class="m-foot reveal">目前就这三件。以后可能会多，也可能一直就这三件 —— 看我们还有没有新的奇怪想法。</p>
   </section>
 
+  <!-- 怎么开始 -->
+  <section id="start">
+    <div class="sec-head reveal">
+      <span class="sec-num">02 /</span>
+      <h2 class="sec-title">怎么<span class="stroke">开始</span></h2>
+      <span class="sec-note">HOW TO START — 三步以内，不用写申请</span>
+    </div>
+    <div class="howto">
+      <div class="howto-col reveal">
+        <h3>想进服务器玩</h3>
+        <div class="h-en">JOIN THE SERVER</div>
+        <ol>
+          <li>写信到 <a class="mailto" href="mailto:hi@kokuu.org">hi@kokuu.org</a>，说一声你想来</li>
+          <li>我们把地址和规矩发给你 —— 没有审核面试，进门直接造</li>
+          <li>不收费、不卖道具。玩不下去随时走，服务器不会拦你</li>
+        </ol>
+      </div>
+      <div class="howto-col reveal">
+        <h3>想用皮肤站</h3>
+        <div class="h-en">USE THE SKIN SITE</div>
+        <ol>
+          <li>去 <a class="mailto" href="https://auth.kokuu.org">auth.kokuu.org</a> 注册一个号</li>
+          <li>上传你的皮肤，拿一个 ID —— 托管和分发都在这儿</li>
+          <li>要登录验证的话，同一个站点直接把鉴权也接上</li>
+        </ol>
+      </div>
+      <div class="howto-col reveal">
+        <h3>想要变声器模型</h3>
+        <div class="h-en">GET A VOICE MODEL</div>
+        <ol>
+          <li>写信告诉我们你要哪种声音、拿来做什么</li>
+          <li>我们交付<b>训练好的成品模型</b>，不是教程也不是半成品</li>
+          <li>拿到就能跑。不好用就直说，我们回去改</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 常去的地方 -->
+  <section id="places">
+    <div class="sec-head reveal">
+      <span class="sec-num">03 /</span>
+      <h2 class="sec-title">常去的<span class="stroke">地方</span></h2>
+      <span class="sec-note">PLACES — 都在 kokuu.org 底下</span>
+    </div>
+    <div class="places">
+      <a class="place reveal" href="https://auth.kokuu.org" target="_blank" rel="noopener">
+        <div class="p-k">SKIN SITE</div>
+        <div class="p-n">皮肤站</div>
+        <div class="p-d">auth.kokuu.org<br>上传皮肤 / 登录验证</div>
+      </a>
+      <a class="place reveal" href="https://chat.kokuu.org" target="_blank" rel="noopener">
+        <div class="p-k">FORUM</div>
+        <div class="p-n">论坛</div>
+        <div class="p-d">chat.kokuu.org<br>聊闲天 / 提建议 / 找人</div>
+      </a>
+      <a class="place reveal" href="mailto:hi@kokuu.org">
+        <div class="p-k">EMAIL</div>
+        <div class="p-n">写信给我们</div>
+        <div class="p-d">hi@kokuu.org<br>人少，回得慢，但都看</div>
+      </a>
+      <div class="place reveal">
+        <div class="p-k">MINECRAFT</div>
+        <div class="p-n">服务器地址</div>
+        <div class="p-d">不写在页面上<br>写信给你 —— 免得被扫描</div>
+      </div>
+    </div>
+  </section>
+
   <!-- 我们怎么做 -->
   <section id="how">
     <div class="sec-head reveal">
-      <span class="sec-num">02 /</span>
+      <span class="sec-num">04 /</span>
       <h2 class="sec-title">我们<span class="stroke">怎么做</span></h2>
       <span class="sec-note">HOW WE WORK — 写在前面的丑话</span>
     </div>
@@ -387,7 +508,7 @@
   <!-- 成员 -->
   <section id="crew">
     <div class="sec-head reveal">
-      <span class="sec-num">03 /</span>
+      <span class="sec-num">05 /</span>
       <h2 class="sec-title">谁在<span class="stroke">做事</span></h2>
       <span class="sec-note">THE CREW — 四个干活的人，和一个空位</span>
     </div>
@@ -424,6 +545,41 @@
     <p class="crew-mail reveal">
       想入伙 / 有事找我们 → <a class="mailto" href="mailto:hi@kokuu.org">hi@kokuu.org</a>
     </p>
+  </section>
+
+  <!-- 常见问题 -->
+  <section id="faq">
+    <div class="sec-head reveal">
+      <span class="sec-num">06 /</span>
+      <h2 class="sec-title">常见<span class="stroke">问题</span></h2>
+      <span class="sec-note">FAQ — 问得最多的几句</span>
+    </div>
+    <div class="faq reveal">
+      <details>
+        <summary>服务器要花钱吗？</summary>
+        <div class="faq-a">不要。<b>不商业化、不卖道具、不搞氪金</b>，服务器长期在线，维护我们自己扛。服务器地址不写在页面上 —— 想来就写信，我们发给你。</div>
+      </details>
+      <details>
+        <summary>你们到底几个人？</summary>
+        <div class="faq-a">四个在干活，第五个位置空着。我们不发招聘启事 —— <b>先一起干点东西，再谈别的</b>。</div>
+      </details>
+      <details>
+        <summary>皮肤站和登录验证是一回事吗？</summary>
+        <div class="faq-a">一个站点两件事：皮肤托管分发，以及登录鉴权。<a class="mailto" href="https://auth.kokuu.org">auth.kokuu.org</a> 上都能做，接上就能用。</div>
+      </details>
+      <details>
+        <summary>变声器要我自己训练吗？</summary>
+        <div class="faq-a">不用。我们交付的是<b>训练好的成品模型</b>，拿来就能跑，不用你从头炼一遍。不满意就直说，回去改。</div>
+      </details>
+      <details>
+        <summary>为什么写这么多「不」？</summary>
+        <div class="faq-a">小团队的坏处是容易被当成没牌子。把话提前讲清楚 —— <b>我们不做什么、我们只做什么</b> —— 比事后补救省事得多。</div>
+      </details>
+      <details>
+        <summary>这个页面有统计吗？</summary>
+        <div class="faq-a">没有。零 Cookie、零统计、零第三方。<b>就一个页面</b>，你看到的就是全部。</div>
+      </details>
+    </div>
   </section>
 
   <!-- 页脚 -->
