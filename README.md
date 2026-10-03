@@ -23,7 +23,20 @@
 | 03 / 常去的地方 | 真实入口链接（皮肤站 / 论坛 / 邮箱） |
 | 04 / 我们怎么做 | 「不做 / 只做」宣言 |
 | 05 / 谁在做事 | 四个成员 + 一个空位 |
-| 06 / 常见问题 | 六条问答（原生 `<details>` 手风琴） |
+| 06 / 造过的东西 | GitHub 开源项目展示（8 个仓库，按产品线分组） |
+
+## 开源项目
+
+| 仓库 | 说明 |
+| --- | --- |
+| [kokuu-site](https://github.com/KokuuStudio/kokuu-site) | 本站 · 单文件零依赖 |
+| [kokuu-skin-server](https://github.com/KokuuStudio/kokuu-skin-server) | KokuuSkin 服务端（基于 Blessing Skin 6.0） |
+| [kokuu-home](https://github.com/KokuuStudio/kokuu-home) | 全站主题 + 可自定义首页 |
+| [kokuu-ui](https://github.com/KokuuStudio/kokuu-ui) | 后台界面重塑（Apple 扁平风） |
+| [kokuu-quote](https://github.com/KokuuStudio/kokuu-quote) | 提瓦特一言 |
+| [kokuu-forum](https://github.com/KokuuStudio/kokuu-forum) | 论坛聚合卡片（Flarum） |
+| [kokuu-forum-points](https://github.com/KokuuStudio/kokuu-forum-points) | 论坛赚积分 + OAuth2 客户端 |
+| [kokuu-credit](https://github.com/KokuuStudio/kokuu-credit) | 积分账本 + OAuth2 服务端 |
 
 ## 入口
 
@@ -38,6 +51,7 @@
 - **响应式**：适配移动端到宽屏
 - **移动端字体兼容**：标题用实心色而非空心描边（见下方「已知坑」）
 - **GitHub Pages 部署**：`CNAME` 绑定 kokuu.org，`.nojekyll` 绕过 Jekyll 处理
+- **零第三方请求**：项目展示区的 GitHub 链接是纯 `<a href>`，不加载任何外部资源
 
 ## 已知坑（别再踩）
 
