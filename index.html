@@ -253,19 +253,43 @@
   .place .p-n { font-size: 18px; font-weight: 900; margin: 6px 0 3px; }
   .place .p-d { font-family: var(--mono); font-size: 12px; color: var(--ink-50); line-height: 1.8; word-break: break-word; }
 
-  /* ---------- 常见问题 ---------- */
-  .faq { border-top: 1px dashed var(--line); }
-  .faq details { border-bottom: 1px dashed var(--line); }
-  .faq summary {
-    list-style: none; cursor: pointer;
-    font-size: clamp(15px, 2.3vw, 18px); font-weight: 700;
-    padding: 20px 0; display: flex; align-items: center; gap: 16px;
+  /* ---------- 造过的东西 ---------- */
+  .repos { display: flex; flex-direction: column; gap: 14px; }
+  .repo {
+    display: flex; align-items: flex-start; gap: 20px; text-decoration: none; color: var(--ink);
+    background: var(--card); border: 1px solid rgba(43,31,82,.1);
+    padding: 22px 24px; transition: transform .22s, box-shadow .22s, border-color .22s;
   }
-  .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::after { content: "+"; margin-left: auto; font-family: var(--mono); color: var(--rain); font-size: 20px; font-weight: 400; }
-  .faq details[open] summary::after { content: "−"; }
-  .faq .faq-a { font-size: 14.5px; line-height: 1.95; color: #463c6b; padding: 0 0 20px; }
-  .faq .faq-a b { color: var(--ink); }
+  .repo:hover { transform: translateX(6px); box-shadow: -5px 0 0 var(--rain); border-color: rgba(15,163,163,.4); }
+  .repo .r-ic {
+    flex: 0 0 auto; width: 46px; height: 46px; margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 19px; font-weight: 900; color: #fff;
+    background: var(--rain); border-radius: 3px;
+  }
+  .repo.haze .r-ic { background: var(--haze); }
+  .repo.ink .r-ic { background: var(--ink); }
+  .repo .r-body { min-width: 0; flex: 1; }
+  .repo .r-name { font-family: var(--mono); font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+  .repo .r-name .r-arrow { color: var(--rain); margin-left: 6px; opacity: 0; transition: opacity .2s, transform .2s; display: inline-block; }
+  .repo:hover .r-name .r-arrow { opacity: 1; transform: translateX(3px); }
+  .repo .r-desc { font-size: 14px; line-height: 1.85; color: #463c6b; margin-top: 5px; }
+  .repo .r-tag {
+    display: inline-block; margin-top: 9px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
+    color: var(--ink-50); border: 1px dashed var(--line); padding: 2px 8px;
+  }
+  .repo-group {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: var(--rain);
+    margin: 30px 0 4px; padding-left: 2px;
+  }
+  .repo-group:first-child { margin-top: 0; }
+  .repo-note {
+    margin-top: 34px; font-family: var(--mono); font-size: 13px; line-height: 2;
+    color: var(--ink-50); text-align: center; letter-spacing: .06em;
+  }
+  .repo-note a { color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--rain); padding-bottom: 1px; }
+  .repo-note a:hover { color: var(--rain); border-bottom-style: solid; }
 
   /* ---------- 页脚 ---------- */
   footer {
@@ -311,7 +335,11 @@
     .howto-col li::before { width: 23px; height: 23px; line-height: 23px; font-size: 11px; }
     .places { gap: 14px; }
     .place { padding: 20px 16px; }
-    .faq summary { padding: 17px 0; }
+    .repo { gap: 14px; padding: 18px 16px; }
+    .repo .r-ic { width: 38px; height: 38px; font-size: 16px; }
+    .repo .r-name { font-size: 13.5px; }
+    .repo .r-desc { font-size: 13px; }
+    .repo-group { margin-top: 24px; }
     .crew-grid { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 14px; }
     .crew .glyph { font-size: 40px; margin-bottom: 10px; }
     .crew .role { font-size: 14px; }
@@ -547,39 +575,89 @@
     </p>
   </section>
 
-  <!-- 常见问题 -->
-  <section id="faq">
+  <!-- 造过的东西 -->
+  <section id="repos">
     <div class="sec-head reveal">
       <span class="sec-num">06 /</span>
-      <h2 class="sec-title">常见<span class="stroke">问题</span></h2>
-      <span class="sec-note">FAQ — 问得最多的几句</span>
+      <h2 class="sec-title">造过的<span class="stroke">东西</span></h2>
+      <span class="sec-note">ON GITHUB — 大部分开源，代码随便看</span>
     </div>
-    <div class="faq reveal">
-      <details>
-        <summary>服务器要花钱吗？</summary>
-        <div class="faq-a">不要。<b>不商业化、不卖道具、不搞氪金</b>，服务器长期在线，维护我们自己扛。服务器地址不写在页面上 —— 想来就写信，我们发给你。</div>
-      </details>
-      <details>
-        <summary>你们到底几个人？</summary>
-        <div class="faq-a">四个在干活，第五个位置空着。我们不发招聘启事 —— <b>先一起干点东西，再谈别的</b>。</div>
-      </details>
-      <details>
-        <summary>皮肤站和登录验证是一回事吗？</summary>
-        <div class="faq-a">一个站点两件事：皮肤托管分发，以及登录鉴权。<a class="mailto" href="https://auth.kokuu.org">auth.kokuu.org</a> 上都能做，接上就能用。</div>
-      </details>
-      <details>
-        <summary>变声器要我自己训练吗？</summary>
-        <div class="faq-a">不用。我们交付的是<b>训练好的成品模型</b>，拿来就能跑，不用你从头炼一遍。不满意就直说，回去改。</div>
-      </details>
-      <details>
-        <summary>为什么写这么多「不」？</summary>
-        <div class="faq-a">小团队的坏处是容易被当成没牌子。把话提前讲清楚 —— <b>我们不做什么、我们只做什么</b> —— 比事后补救省事得多。</div>
-      </details>
-      <details>
-        <summary>这个页面有统计吗？</summary>
-        <div class="faq-a">没有。零 Cookie、零统计、零第三方。<b>就一个页面</b>，你看到的就是全部。</div>
-      </details>
+    <div class="repos">
+
+      <p class="repo-group reveal">皮肤站 KOKUUSKIN</p>
+      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-skin-server" target="_blank" rel="noopener">
+        <span class="r-ic">S</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-skin-server<span class="r-arrow">→</span></div>
+          <div class="r-desc">皮肤站服务端本体。基于开源的 Blessing Skin 6.0 自建部署，撑起整个 KokuuSkin —— 注册、皮肤管理、披风分发都在这儿。</div>
+          <span class="r-tag">PHP · BLESSING SKIN 6.0</span>
+        </div>
+      </a>
+      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-home" target="_blank" rel="noopener">
+        <span class="r-ic">H</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-home<span class="r-arrow">→</span></div>
+          <div class="r-desc">全站主题与可自定义首页。像素网格纹理、方块粒子、六张 MC 场景自动轮播 —— 皮肤站那张脸是他。</div>
+          <span class="r-tag">CSS · PLUGIN</span>
+        </div>
+      </a>
+      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-ui" target="_blank" rel="noopener">
+        <span class="r-ic">U</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-ui<span class="r-arrow">→</span></div>
+          <div class="r-desc">后台界面重塑。把用户中心、皮肤库、管理后台从 AdminLTE 原味改成同一套视觉语言 —— 登录后看到的每一页。</div>
+          <span class="r-tag">CSS · PLUGIN</span>
+        </div>
+      </a>
+      <a class="repo reveal" href="https://github.com/KokuuStudio/kokuu-quote" target="_blank" rel="noopener">
+        <span class="r-ic">Q</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-quote<span class="r-arrow">→</span></div>
+          <div class="r-desc">提瓦特一言。后台顶栏每天换一条短句，点一下就换。少数人是为了这个天天登录的。</div>
+          <span class="r-tag">CSS · PLUGIN</span>
+        </div>
+      </a>
+
+      <p class="repo-group reveal">论坛 FLARUM</p>
+      <a class="repo haze reveal" href="https://github.com/KokuuStudio/kokuu-forum" target="_blank" rel="noopener">
+        <span class="r-ic">F</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-forum<span class="r-arrow">→</span></div>
+          <div class="r-desc">论坛聚合。在皮肤站仪表盘里放一块论坛卡片，直接看最新讨论；顺便接管了内核原有的公告位 —— 换成置顶指定帖。</div>
+          <span class="r-tag">PHP · FLARUM CARD</span>
+        </div>
+      </a>
+      <a class="repo haze reveal" href="https://github.com/KokuuStudio/kokuu-forum-points" target="_blank" rel="noopener">
+        <span class="r-ic">P</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-forum-points<span class="r-arrow">→</span></div>
+          <div class="r-desc">论坛赚积分 + 账号互通。发帖回帖产生加分，签名推给皮肤站记账；也能用皮肤站账号一键登录论坛。只加分，不扣分。</div>
+          <span class="r-tag">PHP · OAUTH2 CLIENT</span>
+        </div>
+      </a>
+      <a class="repo haze reveal" href="https://github.com/KokuuStudio/kokuu-credit" target="_blank" rel="noopener">
+        <span class="r-ic">C</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-credit<span class="r-arrow">→</span></div>
+          <div class="r-desc">积分账本 + 账号互通的服务端。唯一的事实来源在这儿，论坛那边只读余额 —— 账本只有一份，两边就不会对不上。</div>
+          <span class="r-tag">PHP · OAUTH2 SERVER</span>
+        </div>
+      </a>
+
+      <p class="repo-group reveal">这个站</p>
+      <a class="repo ink reveal" href="https://github.com/KokuuStudio/kokuu-site" target="_blank" rel="noopener">
+        <span class="r-ic">K</span>
+        <div class="r-body">
+          <div class="r-name">KokuuStudio/kokuu-site<span class="r-arrow">→</span></div>
+          <div class="r-desc">你现在站的这个页面。单文件、零依赖、零 Cookie、零统计。往下滚还能看到那些雨 —— 那是 Canvas 画的。</div>
+          <span class="r-tag">HTML · CANVAS</span>
+        </div>
+      </a>
     </div>
+    <p class="repo-note reveal">
+      上面这些都能翻，密码和私钥当然不在里面。<br>
+      想接着写或者想拆一个自己用 → <a href="https://github.com/KokuuStudio" target="_blank" rel="noopener">github.com/KokuuStudio</a>
+    </p>
   </section>
 
   <!-- 页脚 -->
